@@ -1,5 +1,4 @@
 import { createSignal } from "solid-js";
-import logo from "./assets/logo.svg";
 import { invoke } from "@tauri-apps/api/core";
 import { isDark, setIsDark } from "./stores/theme";
 import "./App.css";
@@ -9,56 +8,133 @@ function App() {
   const [name, setName] = createSignal("");
 
   async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     setGreetMsg(await invoke("greet", { name: name() }));
   }
 
   return (
-    <main class="container min-h-screen bg-base-100 text-base-content transition-colors duration-300">
-      <div class="flex justify-end p-4">
-        <label class="swap swap-rotate btn btn-ghost btn-circle">
-          <input type="checkbox" checked={isDark()} onChange={() => setIsDark(!isDark())} />
-          {/* sun icon */}
-          <svg class="swap-off h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
-          </svg>
-          {/* moon icon */}
-          <svg class="swap-on h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
-          </svg>
-        </label>
-      </div>
-      <h1>Welcome to Tauri + Solid</h1>
+    <div class="min-h-screen bg-base-100 text-base-content">
 
-      <div class="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://solidjs.com" target="_blank">
-          <img src={logo} class="logo solid" alt="Solid logo" />
-        </a>
+      {/* Navbar */}
+      <div class="navbar bg-base-200 shadow-sm px-4">
+        <div class="flex-1 gap-2">
+          <i class="ri-apps-2-line text-primary text-xl" />
+          <span class="font-bold text-lg">Wizz</span>
+        </div>
+        <div class="flex-none gap-2">
+          <button
+            class="btn btn-ghost btn-circle"
+            onClick={() => setIsDark(!isDark())}
+            title="Toggle theme"
+          >
+            {isDark()
+              ? <i class="ri-sun-line text-xl" />
+              : <i class="ri-moon-line text-xl" />
+            }
+          </button>
+        </div>
       </div>
-      <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
 
-      <form
-        class="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg()}</p>
-    </main>
+      {/* Hero */}
+      <div class="hero py-16">
+        <div class="hero-content text-center flex-col gap-6">
+          <div class="flex gap-4 text-5xl text-primary">
+            <i class="ri-tauri-line" />
+            <i class="ri-flashlight-line" />
+            <i class="ri-code-s-slash-line" />
+          </div>
+          <div>
+            <h1 class="text-4xl font-bold">Welcome to Tauri + Solid</h1>
+            <p class="py-4 text-base-content/70">
+              Click the icons below to learn more about each technology.
+            </p>
+          </div>
+
+          {/* Tech badges */}
+          <div class="flex gap-3 flex-wrap justify-center">
+            <a href="https://tauri.app" target="_blank" class="badge badge-outline badge-lg gap-2 p-4 hover:badge-primary transition-colors">
+              <i class="ri-shield-line" />
+              Tauri
+            </a>
+            <a href="https://vite.dev" target="_blank" class="badge badge-outline badge-lg gap-2 p-4 hover:badge-secondary transition-colors">
+              <i class="ri-flashlight-line" />
+              Vite
+            </a>
+            <a href="https://solidjs.com" target="_blank" class="badge badge-outline badge-lg gap-2 p-4 hover:badge-accent transition-colors">
+              <i class="ri-code-s-slash-line" />
+              SolidJS
+            </a>
+          </div>
+
+          {/* Greet card */}
+          <div class="card bg-base-200 shadow-md w-full max-w-md">
+            <div class="card-body gap-4">
+              <h2 class="card-title justify-center gap-2">
+                <i class="ri-chat-smile-2-line text-primary" />
+                Say Hello
+              </h2>
+              <form
+                class="flex gap-2"
+                onSubmit={(e) => { e.preventDefault(); greet(); }}
+              >
+                <label class="input flex-1 flex items-center gap-2">
+                  <i class="ri-user-line text-base-content/50" />
+                  <input
+                    type="text"
+                    class="grow"
+                    placeholder="Enter your name…"
+                    onInput={(e) => setName(e.currentTarget.value)}
+                  />
+                </label>
+                <button type="submit" class="btn btn-primary gap-2">
+                  <i class="ri-send-plane-line" />
+                  Greet
+                </button>
+              </form>
+              {greetMsg() && (
+                <div class="alert alert-success gap-2">
+                  <i class="ri-checkbox-circle-line text-lg" />
+                  <span>{greetMsg()}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Remix icon showcase */}
+      <div class="container mx-auto px-4 pb-12">
+        <div class="divider">
+          <i class="ri-remixicon-line mr-2" />
+          Remix Icons
+        </div>
+        <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4">
+          {[
+            { icon: "ri-home-4-line", label: "Home" },
+            { icon: "ri-settings-3-line", label: "Settings" },
+            { icon: "ri-notification-line", label: "Notif" },
+            { icon: "ri-search-line", label: "Search" },
+            { icon: "ri-heart-line", label: "Heart" },
+            { icon: "ri-star-line", label: "Star" },
+            { icon: "ri-download-line", label: "Download" },
+            { icon: "ri-upload-line", label: "Upload" },
+            { icon: "ri-file-line", label: "File" },
+            { icon: "ri-folder-line", label: "Folder" },
+            { icon: "ri-image-line", label: "Image" },
+            { icon: "ri-camera-line", label: "Camera" },
+            { icon: "ri-video-line", label: "Video" },
+            { icon: "ri-music-line", label: "Music" },
+            { icon: "ri-map-pin-line", label: "Map" },
+            { icon: "ri-global-line", label: "Global" },
+          ].map(({ icon, label }) => (
+            <div class="flex flex-col items-center gap-1 p-3 rounded-box bg-base-200 hover:bg-base-300 transition-colors cursor-default">
+              <i class={`${icon} text-2xl text-primary`} />
+              <span class="text-xs text-base-content/60">{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
   );
 }
 
