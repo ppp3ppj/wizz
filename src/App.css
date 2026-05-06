@@ -1,6 +1,37 @@
 @import "tailwindcss";
 @import "remixicon/fonts/remixicon.css";
+@import "@fontsource/sarabun/400.css";
+@import "@fontsource/sarabun/500.css";
+@import "@fontsource/sarabun/600.css";
+@import "@fontsource/sarabun/700.css";
 @plugin "daisyui/index.js" {
   themes: light --default, dark --prefersdark;
 }
 
+@media print {
+  body > * {
+    display: none !important;
+  }
+
+  #invoice-document {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 15mm 20mm !important;
+    transform: none !important;
+    box-shadow: none !important;
+    font-family: 'Sarabun', 'Noto Sans Thai', 'TH Sarabun New', 'Tahoma', sans-serif !important;
+    font-size: 11pt !important;
+    color: black !important;
+    background: white !important;
+    box-sizing: border-box !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+}
