@@ -1,16 +1,12 @@
-import { createSignal, createEffect } from "solid-js";
+import { createSignal } from "solid-js";
 import logo from "./assets/logo.svg";
 import { invoke } from "@tauri-apps/api/core";
+import { isDark, setIsDark } from "./stores/theme";
 import "./App.css";
 
 function App() {
   const [greetMsg, setGreetMsg] = createSignal("");
   const [name, setName] = createSignal("");
-  const [isDark, setIsDark] = createSignal(false);
-
-  createEffect(() => {
-    document.documentElement.setAttribute("data-theme", isDark() ? "dark" : "light");
-  });
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
