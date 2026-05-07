@@ -8,6 +8,10 @@
   themes: light --default, dark --prefersdark;
 }
 
+body {
+  font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+}
+
 @media print {
   body > * {
     display: none !important;
