@@ -31,3 +31,23 @@ export interface InvoiceTotals {
   vatAmount: number;
   grandTotal: number;
 }
+
+export interface InvoiceSummary {
+  id: number;
+  invoiceNumber: string;
+  invoiceDate: string;
+  buyerName: string;
+  grandTotal: number;
+  documentType: DocumentType;
+  createdAt: string;
+}
+
+export interface ContactRow {
+  id?: number;
+  type: "seller" | "buyer";
+  name: string;
+  address: string;
+  taxId: string;
+  branch: string;
+  phone: string;
+}

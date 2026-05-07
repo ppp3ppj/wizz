@@ -1,6 +1,7 @@
 import { createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
 import type { InvoiceData, InvoiceTotals, LineItem, PartyInfo } from "../types/invoice";
+import { setSavedId } from "./router";
 
 function defaultParty(): PartyInfo {
   return { name: "", address: "", taxId: "", branch: "สำนักงานใหญ่", phone: "" };
@@ -84,6 +85,7 @@ function updateBuyer(field: keyof PartyInfo, value: string) {
 
 function resetInvoice() {
   setInvoice(defaultInvoice());
+  setSavedId(null);
 }
 
 export { invoice, setInvoice, totals, addItem, removeItem, updateItem, updateSeller, updateBuyer, resetInvoice };

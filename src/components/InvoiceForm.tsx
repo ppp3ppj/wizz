@@ -1,11 +1,13 @@
-import { For } from "solid-js";
+import { For, Show, createSignal } from "solid-js";
 import {
   invoice, setInvoice,
   addItem, removeItem, updateItem,
   updateSeller, updateBuyer,
   resetInvoice, totals,
 } from "../stores/invoice";
-import type { PartyInfo } from "../types/invoice";
+import { savedId, setSavedId } from "../stores/router";
+import { dbSaveInvoice, dbUpdateInvoice, dbGetContacts } from "../services/db";
+import type { PartyInfo, ContactRow } from "../types/invoice";
 
 function thb(n: number) {
   return n.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -17,8 +19,92 @@ function safeNum(val: string) {
 }
 
 export function InvoiceForm() {
+  const [saveMsg, setSaveMsg] = createSignal<{ text: string; ok: boolean } | null>(null);
+  const [saving, setSaving] = createSignal(false);
+  const [picker, setPicker] = createSignal<"seller" | "buyer" | null>(null);
+  const [pickerContacts, setPickerContacts] = createSignal<ContactRow[]>([]);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const id = savedId();
+      if (id != null) {
+        await dbUpdateInvoice(id, invoice, totals());
+        flash("อัปเดตเรียบร้อยแล้ว", true);
+      } else {
+        const newId = await dbSaveInvoice(invoice, totals());
+        setSavedId(newId);
+        flash("บันทึกเรียบร้อยแล้ว", true);
+      }
+    } catch (e: any) {
+      flash(`เกิดข้อผิดพลาด: ${e}`, false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function flash(text: string, ok: boolean) {
+    setSaveMsg({ text, ok });
+    setTimeout(() => setSaveMsg(null), 3000);
+  }
+
+  async function openPicker(type: "seller" | "buyer") {
+    const contacts = await dbGetContacts(type);
+    setPickerContacts(contacts);
+    setPicker(type);
+  }
+
+  function pickContact(c: ContactRow) {
+    const update = picker() === "seller" ? updateSeller : updateBuyer;
+    update("name", c.name);
+    update("address", c.address);
+    update("taxId", c.taxId);
+    update("branch", c.branch);
+    update("phone", c.phone);
+    setPicker(null);
+  }
+
   return (
     <div class="flex flex-col gap-3 p-4">
+
+      {/* Contact picker modal */}
+      <Show when={picker() !== null}>
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setPicker(null)}>
+          <div class="bg-base-100 rounded-box shadow-xl w-80 max-h-96 flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div class="flex items-center gap-2 p-3 border-b border-base-300">
+              <i class="ri-contacts-book-line text-primary" />
+              <span class="font-semibold text-sm">
+                เลือก{picker() === "seller" ? "ผู้ขาย" : "ผู้ซื้อ"}
+              </span>
+              <button class="btn btn-ghost btn-xs btn-circle ml-auto" onClick={() => setPicker(null)}>
+                <i class="ri-close-line" />
+              </button>
+            </div>
+            <div class="overflow-y-auto flex-1 p-2 flex flex-col gap-1">
+              <Show
+                when={pickerContacts().length > 0}
+                fallback={
+                  <p class="text-center text-sm text-base-content/50 py-6">
+                    ยังไม่มีรายชื่อที่บันทึกไว้
+                  </p>
+                }
+              >
+                <For each={pickerContacts()}>
+                  {(c) => (
+                    <button
+                      class="btn btn-ghost btn-sm justify-start text-left h-auto py-2 flex flex-col items-start gap-0"
+                      onClick={() => pickContact(c)}
+                    >
+                      <span class="font-medium">{c.name}</span>
+                      <span class="text-xs text-base-content/50">{c.taxId || c.phone || ""}</span>
+                    </button>
+                  )}
+                </For>
+              </Show>
+            </div>
+          </div>
+        </div>
+      </Show>
 
       {/* Section 1: Document settings */}
       <details class="collapse collapse-arrow bg-base-200 border border-base-300" open>
@@ -80,6 +166,26 @@ export function InvoiceForm() {
             />
             <span class="text-sm">ภาษีมูลค่าเพิ่ม 7%</span>
           </label>
+
+          {/* Save / Update button */}
+          <div class="flex flex-col gap-1">
+            <button
+              class="btn btn-success btn-sm gap-2 w-full"
+              onClick={handleSave}
+              disabled={saving()}
+            >
+              {saving()
+                ? <span class="loading loading-spinner loading-xs" />
+                : <i class="ri-save-line" />
+              }
+              {savedId() != null ? "อัปเดต" : "บันทึก"}
+            </button>
+            <Show when={saveMsg()}>
+              <p class={`text-xs text-center ${saveMsg()!.ok ? "text-success" : "text-error"}`}>
+                {saveMsg()!.text}
+              </p>
+            </Show>
+          </div>
         </div>
       </details>
 
@@ -89,12 +195,11 @@ export function InvoiceForm() {
           <i class="ri-store-2-line mr-2 text-primary" />
           ข้อมูลผู้ขาย
         </summary>
-        <div class="collapse-content pt-2">
-          <PartyFields
-            values={invoice.seller}
-            onUpdate={updateSeller}
-            taxIdRequired
-          />
+        <div class="collapse-content pt-2 flex flex-col gap-2">
+          <button class="btn btn-ghost btn-xs gap-1 self-start" onClick={() => openPicker("seller")}>
+            <i class="ri-contacts-book-line" />เลือกจากรายชื่อ
+          </button>
+          <PartyFields values={invoice.seller} onUpdate={updateSeller} taxIdRequired />
         </div>
       </details>
 
@@ -104,12 +209,11 @@ export function InvoiceForm() {
           <i class="ri-user-3-line mr-2 text-primary" />
           ข้อมูลผู้ซื้อ
         </summary>
-        <div class="collapse-content pt-2">
-          <PartyFields
-            values={invoice.buyer}
-            onUpdate={updateBuyer}
-            taxIdRequired={false}
-          />
+        <div class="collapse-content pt-2 flex flex-col gap-2">
+          <button class="btn btn-ghost btn-xs gap-1 self-start" onClick={() => openPicker("buyer")}>
+            <i class="ri-contacts-book-line" />เลือกจากรายชื่อ
+          </button>
+          <PartyFields values={invoice.buyer} onUpdate={updateBuyer} taxIdRequired={false} />
         </div>
       </details>
 
