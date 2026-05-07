@@ -68,26 +68,33 @@ export function InvoiceDocument() {
         </div>
       </div>
 
-      {/* Items table */}
-      <table style={{ width: "100%", "border-collapse": "collapse", "margin-bottom": "8px", "font-size": "10pt" }}>
+      {/* Items table — table-layout:fixed keeps numeric columns stable */}
+      <table style={{ width: "100%", "border-collapse": "collapse", "margin-bottom": "8px", "font-size": "10pt", "table-layout": "fixed" }}>
+        <colgroup>
+          <col style={{ width: "28px" }} />   {/* # */}
+          <col />                              {/* description — takes remaining space */}
+          <col style={{ width: "52px" }} />   {/* จำนวน */}
+          <col style={{ width: "88px" }} />   {/* ราคา/หน่วย */}
+          <col style={{ width: "96px" }} />   {/* จำนวนเงิน */}
+        </colgroup>
         <thead>
           <tr>
-            <th style={`${headerCellStyle} width: 36px;`}>#</th>
+            <th style={`${headerCellStyle}`}>#</th>
             <th style={`${headerCellStyle} text-align: left;`}>รายการสินค้า / บริการ</th>
-            <th style={`${headerCellStyle} width: 60px;`}>จำนวน</th>
-            <th style={`${headerCellStyle} width: 100px;`}>ราคา/หน่วย</th>
-            <th style={`${headerCellStyle} width: 110px;`}>จำนวนเงิน</th>
+            <th style={`${headerCellStyle}`}>จำนวน</th>
+            <th style={`${headerCellStyle}`}>ราคา/หน่วย</th>
+            <th style={`${headerCellStyle}`}>จำนวนเงิน</th>
           </tr>
         </thead>
         <tbody>
           <For each={invoice.items}>
             {(item, index) => (
               <tr>
-                <td style={`${cellStyle} text-align: center; color: #6b7280;`}>{index() + 1}</td>
-                <td style={cellStyle}>{item.description || <span style={{ color: "#9ca3af" }}>-</span>}</td>
-                <td style={`${cellStyle} text-align: center;`}>{item.qty}</td>
-                <td style={`${cellStyle} text-align: right;`}>{thb(item.unitPrice)}</td>
-                <td style={`${cellStyle} text-align: right; font-weight: 500;`}>{thb(item.qty * item.unitPrice)}</td>
+                <td style={`${cellStyle} text-align: center; color: #6b7280; white-space: nowrap;`}>{index() + 1}</td>
+                <td style={`${cellStyle} word-break: break-word; overflow-wrap: break-word;`}>{item.description || <span style={{ color: "#9ca3af" }}>-</span>}</td>
+                <td style={`${cellStyle} text-align: center; white-space: nowrap;`}>{item.qty}</td>
+                <td style={`${cellStyle} text-align: right; white-space: nowrap;`}>{thb(item.unitPrice)}</td>
+                <td style={`${cellStyle} text-align: right; white-space: nowrap; font-weight: 500;`}>{thb(item.qty * item.unitPrice)}</td>
               </tr>
             )}
           </For>
