@@ -40,10 +40,6 @@ export function InvoicePreview() {
     }
   }
 
-  function handlePrint() {
-    window.print();
-  }
-
   const previewHeight = () => 794 * (297 / 210) * scale();
 
   return (
@@ -57,11 +53,6 @@ export function InvoicePreview() {
           }
           {busy() ? "กำลังสร้าง PDF..." : "ดาวน์โหลด PDF"}
         </button>
-        <button class="btn btn-ghost btn-sm gap-2" onClick={handlePrint} disabled={busy()}>
-          <i class="ri-printer-line" />
-          พิมพ์
-        </button>
-
         {/* Inline status message */}
         {message() && (
           <span class={`text-sm ml-2 ${message()!.ok ? "text-success" : "text-error"}`}>
