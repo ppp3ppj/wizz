@@ -120,74 +120,73 @@ export function InvoiceForm() {
           รายการสินค้า / บริการ
         </summary>
         <div class="collapse-content pt-2 flex flex-col gap-2">
-          <div class="overflow-x-auto">
-            <table class="table table-sm w-full">
-              <thead>
-                <tr>
-                  <th class="w-8 text-center">#</th>
-                  <th>รายการ</th>
-                  <th class="w-16 text-center">จำนวน</th>
-                  <th class="w-24 text-right">ราคา/หน่วย</th>
-                  <th class="w-20 text-right">รวม</th>
-                  <th class="w-8" />
-                </tr>
-              </thead>
-              <tbody>
-                <For each={invoice.items}>
-                  {(item, index) => (
-                    <tr>
-                      <td class="text-center text-base-content/50 text-xs">{index() + 1}</td>
-                      <td>
-                        <label class="input input-xs w-full">
-                          <input
-                            type="text"
-                            placeholder="รายละเอียด"
-                            value={item.description}
-                            onInput={(e) => updateItem(item.id, "description", e.currentTarget.value)}
-                          />
-                        </label>
-                      </td>
-                      <td>
-                        <label class="input input-xs w-full">
-                          <input
-                            type="number"
-                            min="0"
-                            step="1"
-                            value={item.qty}
-                            onInput={(e) => updateItem(item.id, "qty", safeNum(e.currentTarget.value) || 1)}
-                          />
-                        </label>
-                      </td>
-                      <td>
-                        <label class="input input-xs w-full">
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={item.unitPrice}
-                            onInput={(e) => updateItem(item.id, "unitPrice", safeNum(e.currentTarget.value))}
-                          />
-                        </label>
-                      </td>
-                      <td class="text-right text-xs font-medium tabular-nums">
-                        {thb(item.qty * item.unitPrice)}
-                      </td>
-                      <td>
-                        <button
-                          class="btn btn-ghost btn-xs btn-circle text-error"
-                          onClick={() => removeItem(item.id)}
-                          disabled={invoice.items.length === 1}
-                          title="ลบรายการ"
-                        >
-                          <i class="ri-delete-bin-line text-xs" />
-                        </button>
-                      </td>
-                    </tr>
-                  )}
-                </For>
-              </tbody>
-            </table>
-          </div>
+          <For each={invoice.items}>
+            {(item, index) => (
+              <div class="bg-base-100 border border-base-300 rounded-box p-3 flex flex-col gap-2">
+                {/* Row 1: index badge + delete */}
+                <div class="flex items-center justify-between">
+                  <span class="badge badge-soft badge-primary badge-sm">รายการที่ {index() + 1}</span>
+                  <button
+                    class="btn btn-ghost btn-xs btn-circle text-error"
+                    onClick={() => removeItem(item.id)}
+                    disabled={invoice.items.length === 1}
+                    title="ลบรายการ"
+                  >
+                    <i class="ri-delete-bin-line" />
+                  </button>
+                </div>
+
+                {/* Row 2: description — full width */}
+                <fieldset class="fieldset p-0">
+                  <legend class="fieldset-legend">ชื่อสินค้า / รายละเอียด</legend>
+                  <label class="input input-sm w-full">
+                    <input
+                      type="text"
+                      placeholder="ระบุชื่อสินค้าหรือบริการ"
+                      value={item.description}
+                      onInput={(e) => updateItem(item.id, "description", e.currentTarget.value)}
+                    />
+                  </label>
+                </fieldset>
+
+                {/* Row 3: qty | unit price | total */}
+                <div class="grid grid-cols-3 gap-2 items-end">
+                  <fieldset class="fieldset p-0">
+                    <legend class="fieldset-legend">จำนวน</legend>
+                    <label class="input input-sm w-full">
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={item.qty}
+                        onInput={(e) => updateItem(item.id, "qty", safeNum(e.currentTarget.value) || 1)}
+                      />
+                    </label>
+                  </fieldset>
+
+                  <fieldset class="fieldset p-0">
+                    <legend class="fieldset-legend">ราคา / หน่วย (฿)</legend>
+                    <label class="input input-sm w-full">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={item.unitPrice}
+                        onInput={(e) => updateItem(item.id, "unitPrice", safeNum(e.currentTarget.value))}
+                      />
+                    </label>
+                  </fieldset>
+
+                  <fieldset class="fieldset p-0">
+                    <legend class="fieldset-legend">รวม (฿)</legend>
+                    <div class="input input-sm w-full bg-base-200 text-right font-semibold tabular-nums text-primary pointer-events-none select-none">
+                      {thb(item.qty * item.unitPrice)}
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+            )}
+          </For>
 
           <button class="btn btn-outline btn-sm gap-2 w-full" onClick={addItem}>
             <i class="ri-add-line" />
